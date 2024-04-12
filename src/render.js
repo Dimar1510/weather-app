@@ -12,14 +12,11 @@ const render = function() {
     }
     
     function renderApp(data, units) {
-        const circle = document.querySelector('.circle')
-        circle.textContent = 'Loading...'
         wrapper.classList.remove('error')
         imp = units === 'imperial'
         currentCard(data)
         detailsCard(data)
         showForecastDays(data)
-        circle.textContent = ''
         const btnForecastDays = document.querySelector('#toggle-days')
         const btnForecastHours = document.querySelector('#toggle-hours')
         btnForecastDays.classList.add('active')

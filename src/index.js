@@ -1,3 +1,7 @@
 import { load } from "./handler"
 
-load('London')
+if (localStorage.getItem('location')) {
+    load(localStorage.getItem('location'))  
+} else {
+    load('London')
+}

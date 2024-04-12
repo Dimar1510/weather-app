@@ -4,7 +4,8 @@ import { render } from "./render";
 export async function load(location, units) {
     try {
         const weatherData = await api.getWeatherData(location)
-        render.renderApp(weatherData, units)   
+        render.renderApp(weatherData, units)
+        localStorage.setItem('location', weatherData.city)
     } catch (error) {
         render.renderError()
     }
@@ -28,4 +29,5 @@ function submit(input) {
     if (input.trim() === '' ) return
     load(input.trim(), '')
     searchbar.value = ''
+    
 }
