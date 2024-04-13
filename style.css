@@ -24,7 +24,7 @@ body {
     justify-content: center;
     background-color: var(--clr-bg);
     color: var(--clr-text);
-    font-family: "Montserrat";
+    font-family: "Montserrat", sans-serif;
     font-weight: 300;
     position: relative;
     transition: 1s ease-in-out background;
@@ -145,12 +145,12 @@ input:-webkit-autofill {
 }
 
 .current-wrapper {
-    display: none;
+    opacity: 0;
     flex-direction: column;
     justify-content: space-between;
     flex: 1;
     padding: 2rem 0.5rem 0rem;
-   
+    transition: 1s ease-in-out;
 }
 
 .adress {
