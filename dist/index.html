@@ -14,16 +14,19 @@
     <div class="main">
         <div class="current card">
             <div class="search">
-                <input type="text" id="searchbar" placeholder="Search location...">
+                <input type="text" id="searchbar" >
                 <button id="btnSubmit">&#10148</button>
             </div>
-            <div class="error">Error: location not found</div>
+            <div class="error"></div>
             <div class="loader"></div>
             <div class="circle"></div>
             <div class="current-wrapper">
                 <div class="stats">
                     <div class="location">
-                        <div class="adress"></div>
+                        <div class="adress">
+                            <div id="city"></div>
+                            <div id="country"></div>
+                        </div>
                         <div class="date">
                             <span class="current-day"></span>
                             <span class="current-time"></span>
@@ -35,10 +38,7 @@
                     <div class="summary">
                         <div class="summary-main">
                             <div class="current-icon">
-                                
-                            <!-- <span class="material-symbols-outlined">
-                                clear_day
-                                </span> -->
+                            
                             </div>
                             <div class="current-temp"></div>       
                         </div>
@@ -80,15 +80,16 @@
                     
                 </div>
             </div>
+
         </div>
         <div class="details card">
             <div class="details-heading heading">
                 <div class="card-title">
                     Today's weather details    
                 </div>
-                <div class="toggle-unit toggle">
+                <button class="toggle-unit toggle">
                     <span>C°</span>/<span>F°</span>
-                </div>
+                </button>
                 
             </div>
             <ul class="details-list">            
@@ -138,12 +139,12 @@
         </div>
         <div class="forecast card">
             <div class="forecast-heading heading">
-                <div class=" toggle active" id="toggle-days">
+                <button class=" toggle active" id="toggle-days">
                     Daily
-                </div>
-                <div class=" toggle" id="toggle-hours">
+                </button>
+                <button class=" toggle" id="toggle-hours">
                     Hourly
-                </div>
+                </button>
             </div>
             <ul class="forecast-list">
 
@@ -152,5 +153,6 @@
         </div>
     </div>
     <script src="main.js"></script>
+   <!-- <script src="test.js"></script> -->
 </body>
 </html>

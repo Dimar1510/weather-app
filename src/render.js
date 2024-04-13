@@ -4,16 +4,53 @@ import { load } from "./handler";
 const render = function() {
     let imp = false;
     const wrapper = document.querySelector('.main')
-    const card = document.querySelector('.current-wrapper')
+    
+    function renderError(status) {
+        const errorText = document.querySelector('.error')
+        switch (status) {
+            case 400:
+                errorText.textContent = "Unable to find that location"
+                break;
+                
+            default:
+                errorText.textContent = ""
+                
+                break;
+        }
+        console.log('Response status:', status)
+        showLoading('done')
+    }
 
-    function renderError() {
-        wrapper.classList.add('error')
-       
+    function showLoading(state) {
+        const loading = document.querySelector('.loader')
+        const card = document.querySelector('.current-wrapper')
+        const buttons = document.querySelectorAll('button')
+        const searchbar = document.querySelector('#searchbar')
+        if (state === 'loading') {
+            loading.style.display = 'block'
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+            searchbar.disabled = true;
+            searchbar.placeholder = 'Awaiting response from service...';
+            card.style.opacity = '0.5';
+        }
+        else {
+            loading.style.display = 'none'
+            card.style.display = 'flex'
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
+            searchbar.disabled = false;
+            searchbar.placeholder = 'Search location';
+            card.style.opacity = '1'
+        }
     }
     
     function renderApp(data, units) {
         wrapper.classList.remove('error')
         imp = units === 'imperial'
+        setBackground(data)
         currentCard(data)
         detailsCard(data)
         showForecastDays(data)
@@ -32,13 +69,30 @@ const render = function() {
             btnForecastDays.classList.remove('active')
             btnForecastHours.classList.add('active')
         })
-
+    }
+    
+    function convertTime(time) {
+        let newTime = time.split(':')
+        if (newTime[1].endsWith('PM')) newTime[0] = parseInt(newTime[0])+12
+        newTime = newTime.join(':').slice(0,5)
+        return newTime
     }
 
- 
+    function setBackground(data) {    
+        const localTime = parseInt(format(data.time, "H:mm").split(':').join(''))
+        const sunsetTime = parseInt(convertTime(data.sunset).split(':').join(''))
+        const sunriseTime = parseInt(convertTime(data.sunrise).split(':').join(''))
+
+        if (localTime < sunsetTime && localTime > sunriseTime) {
+            document.body.classList.remove('night')
+        } else {
+            document.body.classList.add('night')
+        }
+    }
 
     function currentCard(data) {
-        const adress = document.querySelector('.adress')
+        const city = document.querySelector('#city')
+        const country = document.querySelector('#country')
         const day = document.querySelector('.current-day')
         const time = document.querySelector('.current-time')
         const icon = document.querySelector('.current-icon')
@@ -48,20 +102,18 @@ const render = function() {
         const minTemp = document.querySelector('.min')
         const maxTemp = document.querySelector('.max')
         const sunrise = document.querySelector('#sunrise')
-        const sunset = document.querySelector('#sunset')
+        const sunset = document.querySelector('#sunset')    
 
-        const loading = document.querySelector('.loader')
-        
-
-        loading.style.display = 'none'
-        card.style.display = 'flex'
-        
         //location
-        adress.textContent = `${data.city}, ${data.country}`
-        imp? day.textContent = format(data.time, "EEEE, LLL d yyyy") :
-        day.textContent = format(data.time, "EEEE, d LLL yyyy")
-        imp? time.textContent = format(data.time, "p"):
-        time.textContent = format(data.time, "H:mm")
+        if (data.city !== undefined && data.country !== undefined) {
+            city.textContent = `${data.city}, `
+            country.textContent = `${data.country}`    
+        }
+        
+        day.textContent = imp? format(data.time, "EEEE, LLL d yyyy") :
+        format(data.time, "EEEE, d LLL yyyy")
+        time.textContent = imp? format(data.time, "p"):
+        format(data.time, "H:mm")
 
         //main summary
         const condIcon = document.createElement('img')
@@ -84,25 +136,8 @@ const render = function() {
         sunset.textContent = imp? 
         `Sunset: ${data.sunset}`:
         `Sunset: ${convertTime(data.sunset)}`
-        
-        function convertTime(time) {
-            let newTime = time.split(':')
-            if (newTime[1].endsWith('PM')) newTime[0] = parseInt(newTime[0])+12
-            newTime = newTime.join(':').slice(0,5)
-            return newTime
-        }
 
-        //set day/night background
-        const localTime = parseInt(format(data.time, "H:mm").split(':').join(''))
-        const sunsetTime = parseInt(convertTime(data.sunset).split(':').join(''))
-        const sunriseTime = parseInt(convertTime(data.sunrise).split(':').join(''))
-
-        if (localTime < sunsetTime && localTime > sunriseTime) {
-            document.body.classList.remove('night')
-        } else {
-            document.body.classList.add('night')
-        }
-
+        // console.log(wrapper.getBoundingClientRect().height > window.innerHeight)
     }
 
     function detailsCard(data) {
@@ -143,6 +178,7 @@ const render = function() {
         } 
         list.classList.add('hours')   
         
+        //horizontal scroll
         list.addEventListener("wheel", (e) => {
             e.preventDefault();
             if (e.deltaY > 0) list.scrollLeft += 20;
@@ -150,7 +186,21 @@ const render = function() {
         });
     }
  
- 
+    function createTooltip(data, item) {
+        const tooltip = document.createElement('div')
+        tooltip.classList.add('tooltip')
+        tooltip.textContent = data
+
+        //position tooltip relative to pointer
+        item.onmousemove = function (e) {
+            const x = e.clientX;
+            const y = e.clientY;
+            tooltip.style.top = (y + 20) + 'px';
+            tooltip.style.left = (x + 20) + 'px';
+        };
+        return tooltip
+    }
+
     function forecastDayCard(data, element) {
         const day = data.forecastDays[element]
         const item = document.createElement('li')
@@ -170,7 +220,7 @@ const render = function() {
         `${day.minTempF}°F / ${day.maxTempF}°F` :
         `${day.minTempC}°C / ${day.maxTempC}°C`
 
-        item.append(date, icon, minmax)
+        item.append(date, icon, minmax, createTooltip(day.conditionText, item))
         return item
     }
 
@@ -191,14 +241,14 @@ const render = function() {
         temp.textContent = imp? 
         `${hour.tempF}°F` : `${hour.tempC}°C`
 
-        item.append(date, icon, temp)
+        item.append(date, icon, temp, createTooltip(hour.conditionText, item))
 
         return item
     }
 
 
 
-    return {renderApp, renderError}
+    return {renderApp, renderError, showLoading}
 }()
 
 export { render }

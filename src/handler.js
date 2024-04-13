@@ -2,14 +2,18 @@ import { api } from "./api";
 import { render } from "./render";
 
 export async function load(location, units) {
+    let weatherData
     try {
-        const weatherData = await api.getWeatherData(location)
-        render.renderApp(weatherData, units)
-        localStorage.setItem('location', weatherData.city)
+        render.showLoading('loading')
+        weatherData = await api.getWeatherData(location)
+        render.renderApp(weatherData.data, units)
+        if (typeof(weatherData.data.city) === 'string') localStorage.setItem('location', weatherData.data.city)
+        render.showLoading('done')
+        render.renderError(weatherData.code)
     } catch (error) {
-        render.renderError()
+        render.renderError(weatherData.code)
     }
-
+   
 }
 
 const searchbar = document.querySelector('#searchbar')

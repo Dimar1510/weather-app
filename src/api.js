@@ -1,15 +1,24 @@
 const api = function() {
     const KEY = '473492deee684591b2a65102241104';
     async function getWeatherData(location) {
+        let response
         try {
-            const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${KEY}&q=${location}&days=3&aqi=no&alerts=no`, {mode:'cors', signal: AbortSignal.timeout(6000)});
+            response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${KEY}&q=${location}&days=3&aqi=no&alerts=no`, {mode:'cors', signal: AbortSignal.timeout(6000)});
             const result = await response.json();
             const data = processedData(result)
             
-            return data
+            return {
+                data: data, 
+                code: response?.status
+            }
         } catch (error) {
-            console.log('api error')
+            
+            return {
+                data: {}, 
+                code: response ? response.status : error.message
+            }
         }
+      
     }
 
 
@@ -43,27 +52,29 @@ const api = function() {
             forecastDays: [],
             forecastHours: []
         }
-
+        
         for (let i = 0; i < data.forecast.forecastday.length; i++) {
+            const thisDay = data.forecast.forecastday[i]
             const day = {
-                date: data.forecast.forecastday[i].date,
-                conditionIcon: data.forecast.forecastday[i].day.condition.icon,
-                conditionText: data.forecast.forecastday[i].day.condition.text,
-                minTempC: Math.round(data.forecast.forecastday[i].day.mintemp_c),
-                minTempF: Math.round(data.forecast.forecastday[i].day.mintemp_f),
-                maxTempC: Math.round(data.forecast.forecastday[i].day.maxtemp_c),
-                maxTempF: Math.round(data.forecast.forecastday[i].day.maxtemp_f)
+                date: thisDay.date,
+                conditionIcon: thisDay.day.condition.icon,
+                conditionText: thisDay.day.condition.text,
+                minTempC: Math.round(thisDay.day.mintemp_c),
+                minTempF: Math.round(thisDay.day.mintemp_f),
+                maxTempC: Math.round(thisDay.day.maxtemp_c),
+                maxTempF: Math.round(thisDay.day.maxtemp_f)
             }
             currentWeatherData.forecastDays.push(day)
         }
 
-        for (let i = 0; i < data.forecast.forecastday[1].hour.length; i++) {
+        for (let i = 0; i < data.forecast.forecastday[0].hour.length; i++) {
+            const thisHour = data.forecast.forecastday[0].hour[i]
             const hour = {
-                time: data.forecast.forecastday[1].hour[i].time,
-                conditionIcon: data.forecast.forecastday[1].hour[i].condition.icon,
-                conditionText: data.forecast.forecastday[1].hour[i].condition.text,
-                tempC: Math.round(data.forecast.forecastday[1].hour[i].temp_c),
-                tempF: Math.round(data.forecast.forecastday[1].hour[i].temp_f),
+                time: thisHour.time,
+                conditionIcon: thisHour.condition.icon,
+                conditionText: thisHour.condition.text,
+                tempC: Math.round(thisHour.temp_c),
+                tempF: Math.round(thisHour.temp_f),
             }
             currentWeatherData.forecastHours.push(hour)
         }
