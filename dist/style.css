@@ -145,6 +145,7 @@ input:-webkit-autofill {
 }
 
 .current-wrapper {
+    display: none;
     opacity: 0;
     flex-direction: column;
     justify-content: space-between;

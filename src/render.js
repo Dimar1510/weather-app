@@ -36,6 +36,7 @@ const render = function() {
             card.style.opacity = '0.5';
         }
         else {
+            card.style.display = 'flex'
             loading.style.display = 'none'
             buttons.forEach(button => {
                 button.disabled = false;
