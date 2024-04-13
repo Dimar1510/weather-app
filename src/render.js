@@ -37,7 +37,6 @@ const render = function() {
         }
         else {
             loading.style.display = 'none'
-            card.style.display = 'flex'
             buttons.forEach(button => {
                 button.disabled = false;
             });
