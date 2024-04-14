@@ -301,8 +301,6 @@ input:-webkit-autofill {
     font-weight: bolder;
 }
 
-
-
 .toggle {
     background: none;
     border: 1px solid var(--clr-accent);
@@ -382,6 +380,10 @@ input:-webkit-autofill {
     overflow-x: auto;
 }
 
+.forecast-list.hours {
+    justify-content: space-between;
+}
+
 .forecast-item {
     display: flex;
     flex-direction: column;
@@ -414,6 +416,14 @@ input:-webkit-autofill {
   
 .forecast-list::-webkit-scrollbar-thumb:hover {
     background: var(--clr-text)
+}
+
+/* scrollbar styling for firefox */
+@-moz-document url-prefix(){
+    .forecast-list {
+        scrollbar-color: var(--clr-accent) rgba(0,0,0,0);
+        scrollbar-width: thin;
+    }
 }
 
 .tooltip {
