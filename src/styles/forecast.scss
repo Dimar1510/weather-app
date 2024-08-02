@@ -1,0 +1,86 @@
+@import "../styles/vars.scss";
+
+.forecast {
+  grid-column: 2/3;
+  grid-row: 2/3;
+  display: grid;
+  width: 100%;
+}
+
+.forecast-heading {
+  align-self: start;
+}
+
+.forecast-list {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-around;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.forecast-list.hours {
+  justify-content: space-between;
+}
+
+.forecast-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8rem;
+  position: relative;
+}
+
+.item-icon > span {
+  font-size: 3rem;
+}
+
+.item-day,
+.item-conditions {
+  color: $clr-text-sec;
+}
+
+.forecast-list::-webkit-scrollbar {
+  height: 6px;
+}
+
+.forecast-list::-webkit-scrollbar-track {
+  background: none;
+}
+
+.forecast-list::-webkit-scrollbar-thumb {
+  background: var(--clr-accent);
+  border-radius: 5px;
+}
+
+.forecast-list::-webkit-scrollbar-thumb:hover {
+  background: $clr-text;
+}
+
+/* scrollbar styling for firefox */
+@-moz-document url-prefix() {
+  .forecast-list {
+    scrollbar-color: var(--clr-accent) rgba(0, 0, 0, 0);
+    scrollbar-width: thin;
+  }
+}
+
+.tooltip {
+  position: fixed;
+  overflow: hidden;
+  background-color: rgba(34, 34, 34, 0.8);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  user-select: none;
+  pointer-events: none;
+  z-index: 10;
+  scale: 0;
+  transform-origin: top left;
+  transition: 0.2s ease-out scale;
+}
+
+.forecast-item:has(img:hover) > .tooltip {
+  scale: 100%;
+}

@@ -1,7 +1,8 @@
-import { load } from "./handler"
+import { load } from "./handler";
+import "./styles/index.scss";
 
-if (localStorage.getItem('location')) {
-    load(localStorage.getItem('location'))  
+if (localStorage.getItem("location")) {
+  load(localStorage.getItem("location"));
 } else {
-    load('London')
+  load("London");
 }
