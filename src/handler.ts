@@ -1,7 +1,8 @@
 import { api } from "./api";
 import { render } from "./render";
+import { getElement } from "./utils";
 
-export async function load(location, units) {
+export async function load(location: string, units?: "imperial" | "") {
   let weatherData;
   try {
     render.showLoading("loading");
@@ -20,10 +21,10 @@ export async function load(location, units) {
   }
 }
 
-const searchbar = document.querySelector("#searchbar");
-const btnSubmit = document.querySelector("#btnSubmit");
+const searchbar = getElement<HTMLInputElement>("#searchbar");
+const btnSubmit = getElement<HTMLButtonElement>("#btnSubmit");
 
-searchbar.addEventListener("keypress", (e) => {
+searchbar.addEventListener("keypress", (e: KeyboardEvent) => {
   if (e.key === "Enter") {
     submit(searchbar.value);
   }
@@ -33,7 +34,7 @@ btnSubmit.addEventListener("click", () => {
   submit(searchbar.value);
 });
 
-function submit(input) {
+function submit(input: string) {
   if (input.trim() === "") return;
   load(input.trim(), "");
   searchbar.value = "";

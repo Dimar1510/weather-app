@@ -3,13 +3,14 @@ import { load } from "./handler";
 import "./styles/current.scss";
 import "./styles/forecast.scss";
 import "./styles/details.scss";
+import { getElement } from "./utils";
 
-const render = (function () {
+const render = (() => {
   let imp = false;
-  const wrapper = document.querySelector(".main");
+  const wrapper = getElement<HTMLElement>(".main");
 
-  function renderError(status) {
-    const errorText = document.querySelector(".error");
+  function renderError(status: string | number) {
+    const errorText = getElement<HTMLElement>(".error");
     switch (status) {
       case 400:
         errorText.textContent = "Unable to find that location";
@@ -24,11 +25,11 @@ const render = (function () {
     showLoading("done");
   }
 
-  function showLoading(state) {
-    const loading = document.querySelector(".loader");
-    const card = document.querySelector(".current-wrapper");
+  function showLoading(state: "loading" | "done") {
+    const loading = getElement<HTMLElement>(".loader");
+    const card = getElement<HTMLElement>(".current-wrapper");
     const buttons = document.querySelectorAll("button");
-    const searchbar = document.querySelector("#searchbar");
+    const searchbar = getElement<HTMLInputElement>("#searchbar");
     if (state === "loading") {
       loading.style.display = "block";
       buttons.forEach((button) => {
@@ -49,15 +50,15 @@ const render = (function () {
     }
   }
 
-  function renderApp(data, units) {
+  function renderApp(data: IWeather, units: "imperial" | "") {
     wrapper.classList.remove("error");
     imp = units === "imperial";
     setBackground(data);
     currentCard(data);
     detailsCard(data);
     showForecastDays(data);
-    const btnForecastDays = document.querySelector("#toggle-days");
-    const btnForecastHours = document.querySelector("#toggle-hours");
+    const btnForecastDays = getElement<HTMLElement>("#toggle-days");
+    const btnForecastHours = getElement<HTMLElement>("#toggle-hours");
     btnForecastDays.classList.add("active");
     btnForecastHours.classList.remove("active");
 
@@ -73,14 +74,15 @@ const render = (function () {
     });
   }
 
-  function convertTime(time) {
-    let newTime = time.split(":");
-    if (newTime[1].endsWith("PM")) newTime[0] = parseInt(newTime[0]) + 12;
-    newTime = newTime.join(":").slice(0, 5);
-    return newTime;
+  function convertTime(time: string) {
+    const newTime = time.split(":");
+    if (newTime[1].endsWith("PM")) {
+      newTime[0] = (parseInt(newTime[0]) + 12).toString();
+    }
+    return newTime.join(":").slice(0, 5);
   }
 
-  function setBackground(data) {
+  function setBackground(data: IWeather) {
     const localTime = parseInt(format(data.time, "H:mm").split(":").join(""));
     const sunsetTime = parseInt(convertTime(data.sunset).split(":").join(""));
     const sunriseTime = parseInt(convertTime(data.sunrise).split(":").join(""));
@@ -92,19 +94,19 @@ const render = (function () {
     }
   }
 
-  function currentCard(data) {
-    const city = document.querySelector("#city");
-    const country = document.querySelector("#country");
-    const day = document.querySelector(".current-day");
-    const time = document.querySelector(".current-time");
-    const icon = document.querySelector(".current-icon");
-    const temp = document.querySelector(".current-temp");
-    const conditions = document.querySelector(".conditions");
-    const feelslike = document.querySelector(".feelslike");
-    const minTemp = document.querySelector(".min");
-    const maxTemp = document.querySelector(".max");
-    const sunrise = document.querySelector("#sunrise");
-    const sunset = document.querySelector("#sunset");
+  function currentCard(data: IWeather) {
+    const city = getElement<HTMLElement>("#city");
+    const country = getElement<HTMLElement>("#country");
+    const day = getElement<HTMLElement>(".current-day");
+    const time = getElement<HTMLElement>(".current-time");
+    const icon = getElement<HTMLElement>(".current-icon");
+    const temp = getElement<HTMLElement>(".current-temp");
+    const conditions = getElement<HTMLElement>(".conditions");
+    const feelslike = getElement<HTMLElement>(".feelslike");
+    const minTemp = getElement<HTMLElement>(".min");
+    const maxTemp = getElement<HTMLElement>(".max");
+    const sunrise = getElement<HTMLElement>("#sunrise");
+    const sunset = getElement<HTMLElement>("#sunset");
 
     //location
     if (data.city !== undefined && data.country !== undefined) {
@@ -144,8 +146,8 @@ const render = (function () {
       : `Sunset: ${convertTime(data.sunset)}`;
   }
 
-  function detailsCard(data) {
-    const btnUnitToggle = document.querySelector(".toggle-unit");
+  function detailsCard(data: IWeather) {
+    const btnUnitToggle = getElement<HTMLButtonElement>(".toggle-unit");
     btnUnitToggle.classList.remove("F", "C");
     imp ? btnUnitToggle.classList.add("F") : btnUnitToggle.classList.add("C");
     btnUnitToggle.onclick = () => {
@@ -158,11 +160,11 @@ const render = (function () {
       }
     };
 
-    const humidity = document.querySelector(".humidity");
-    const precipitation = document.querySelector(".precipitation");
-    const windSpeed = document.querySelector(".wind-speed");
-    const cloudiness = document.querySelector(".cloudiness");
-    const uv = document.querySelector(".uv-index");
+    const humidity = getElement<HTMLElement>(".humidity");
+    const precipitation = getElement<HTMLElement>(".precipitation");
+    const windSpeed = getElement<HTMLElement>(".wind-speed");
+    const cloudiness = getElement<HTMLElement>(".cloudiness");
+    const uv = getElement<HTMLElement>(".uv-index");
 
     humidity.textContent = `${data.humidity}%`;
     precipitation.textContent = `${data.precipitation}%`;
@@ -170,11 +172,11 @@ const render = (function () {
       ? `${data.windSpeedMph} mph`
       : `${data.windSpeedKph} km/h`;
     cloudiness.textContent = `${data.cloudiness}%`;
-    uv.textContent = data.uv;
+    uv.textContent = data.uv.toString();
   }
 
-  function showForecastDays(data) {
-    const list = document.querySelector(".forecast-list");
+  function showForecastDays(data: IWeather) {
+    const list = getElement<HTMLElement>(".forecast-list");
     list.innerHTML = "";
     for (let i = 0; i < data.forecastDays.length; i++) {
       list.append(forecastDayCard(data, i));
@@ -182,8 +184,8 @@ const render = (function () {
     list.classList.remove("hours");
   }
 
-  function showForecastHours(data) {
-    const list = document.querySelector(".forecast-list");
+  function showForecastHours(data: IWeather) {
+    const list = getElement<HTMLElement>(".forecast-list");
     list.innerHTML = "";
     for (let i = 0; i < data.forecastHours.length; i++) {
       list.append(forecastHourCard(data, i));
@@ -193,7 +195,7 @@ const render = (function () {
     //horizontal scroll
     list.addEventListener(
       "wheel",
-      (e) => {
+      (e: WheelEvent) => {
         e.preventDefault();
         if (e.deltaY > 0) list.scrollLeft += 20;
         else list.scrollLeft -= 20;
@@ -202,10 +204,10 @@ const render = (function () {
     );
   }
 
-  function createTooltip(data, item) {
+  function createTooltip(text: string, item: HTMLElement) {
     const tooltip = document.createElement("div");
     tooltip.classList.add("tooltip");
-    tooltip.textContent = data;
+    tooltip.textContent = text;
 
     //position tooltip relative to pointer
     item.onmousemove = function (e) {
@@ -217,8 +219,8 @@ const render = (function () {
     return tooltip;
   }
 
-  function forecastDayCard(data, element) {
-    const day = data.forecastDays[element];
+  function forecastDayCard(data: IWeather, index: number) {
+    const day = data.forecastDays[index];
     const item = document.createElement("li");
     item.classList.add("forecast-item");
     const date = document.createElement("div");
@@ -240,8 +242,8 @@ const render = (function () {
     return item;
   }
 
-  function forecastHourCard(data, element) {
-    const hour = data.forecastHours[element];
+  function forecastHourCard(data: IWeather, index: number) {
+    const hour = data.forecastHours[index];
     const item = document.createElement("li");
     item.classList.add("forecast-item");
     const date = document.createElement("div");
